@@ -84,7 +84,7 @@
 
           if (casino.gameMachines[numberGameMachine - 1] != null) {
             casino.gameMachines.splice(numberGameMachine - 1, 1);
-            casino.gameMachines.reduce((gm) =>
+            casino.gameMachines.map((gm) =>
               gm.putMoney(theRemainingMoney / casino.gameMachines.length)
             );
           } else {
@@ -162,6 +162,7 @@
       const royalChisburgerCasino = ben.createCasino("Royal Chisburger");
       ben.createGameMachine(100, royalChisburgerCasino);
       ben.createGameMachine(200, royalChisburgerCasino);
+       ben.createGameMachine(200, royalChisburgerCasino);
       ben.takeMoney(40, royalChisburgerCasino);
       console.log(royalChisburgerCasino.getMoney);
       const bigMacCasino = ben.createCasino("Big Mac");
