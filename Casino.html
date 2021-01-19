@@ -45,7 +45,7 @@
         }
 
         takeMoney(number, casino) {
-          let sortGameMachines = casino.gameMachines.sort(
+          let sortGameMachines = casino.gameMachines.slice().sort(
             (a, b) => b.getMoney - a.getMoney
           );
           let amountMoney = number;
