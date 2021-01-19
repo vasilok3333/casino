@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Casino</title>
+  </head>
+  <body>
+    <script>
+      class User {
+        constructor(name, money) {
+          if (money < 0) {
+            throw new Error("Money should greater or euqal than 0");
+          }
+
+          this.name = name;
+          this.money = money;
+        }
+
+        play(money, casino, gameMachineNumber) {
+          this.money = this.money - money;
+
+          if (this.money < 0) {
+            throw new Error("Not enough money to play");
+          }
+
+          const prize = casino.gameMachines[gameMachineNumber].play(money);
+
+          this.money = this.money + prize;
+        }
+      }
+
+      class SuperAdmin extends User {
+        createCasino(name) {
+          return new Casino(name);
+        }
+
+        createGameMachine(money, casino) {
+          this.money = this.money - money;
+
+          if (this.money < 0) {
+            throw new Error("Not enough money to create new Game Machine");
+          }
+          casino.createGameMachine(money);
+        }
+
+        takeMoney(number, casino) {
+          let sortGameMachines = casino.gameMachines.sort(
+            (a, b) => b.getMoney - a.getMoney
+          );
+          let amountMoney = number;
+          for (let i = 0; i < sortGameMachines.length; i++) {
+            let gm = sortGameMachines[i];
+            if (amountMoney - gm.getMoney > 0) {
+              amountMoney -= gm.getMoney;
+              gm.takeMoney(gm.getMoney);
+            } else {
+              gm.takeMoney(amountMoney);
+              this.money += amountMoney;
+              amountMoney=0;
+              break;
+            }
+          }
+          if (amountMoney > 0) {
+            throw new Error(
+              `in machines there is no required amount for withdrawal. Output amount: ${
+                number - amountMoney
+              }`
+            );
+          } else {
+          
+            return number;
+          }
+        }
+
+        putMoneyToGameMachine(money, casino, numberGameMachine) {
+          casino.gameMachines[numberGameMachine - 1].putMoney(money);
+        }
+        /* note that the numbers of gaming machines will start with 1.*/
+
+        removeGameMachine(casino, numberGameMachine) {
+          let theRemainingMoney =
+            casino.gameMachines[numberGameMachine - 1].getMoney;
+
+          if (casino.gameMachines[numberGameMachine - 1] != null) {
+            casino.gameMachines.splice(numberGameMachine - 1, 1);
+            casino.gameMachines.reduce((gm) =>
+              gm.putMoney(theRemainingMoney / casino.gameMachines.length)
+            );
+          } else {
+            throw new Error(
+              "There is no gaming machine with this number in this casino"
+            );
+          }
+        }
+      }
+
+      class Casino {
+        constructor(name) {
+          this.name = name;
+
+          this.gameMachines = [];
+        }
+
+        get getMoney() {
+          return this.gameMachines.reduce((gm) => gm.getMoney);
+        }
+
+        get getMachineCount() {
+          return this.gameMachines.length;
+        }
+
+        createGameMachine(money) {
+          this.gameMachines.push(new GameMachine(money));
+        }
+      }
+
+      class GameMachine {
+        constructor(money) {
+          this.money = money;
+        }
+
+        get getMoney() {
+          return this.money;
+        }
+
+        takeMoney(amountToTake) {
+          this.money -= amountToTake;
+        }
+
+        putMoney(amountToPut) {
+          this.money += amountToPut;
+        }
+
+        play(amount) {
+          this.money = this.money + amount;
+          let prize = 0;
+
+          let randomNum = String(Math.floor(Math.random() * 1000 + 100));
+          let set = new Set();
+
+          for (let i = 0; i < 3; i++) {
+            set.add(randomNum[i]);
+          }
+
+          if (set.size == 1) {
+            prize = amount * 3;
+          } else if (set.size == 2) {
+            prize = amount * 2;
+          }
+
+          this.money = this.money - prize;
+
+          return prize;
+        }
+      }
+
+      // SuperAdmin
+      const ben = new SuperAdmin("Ben", 1000);
+      console.log(ben);
+
+      const royalChisburgerCasino = ben.createCasino("Royal Chisburger");
+      ben.createGameMachine(100, royalChisburgerCasino);
+      ben.createGameMachine(200, royalChisburgerCasino);
+      ben.takeMoney(40, royalChisburgerCasino);
+      console.log(royalChisburgerCasino.getMoney);
+      const bigMacCasino = ben.createCasino("Big Mac");
+
+      ben.createGameMachine(100, bigMacCasino);
+
+      // User
+      const bob = new User("Bob", 50);
+
+      bob.play(10, royalChisburgerCasino, 0);
+
+      bob.play(20, royalChisburgerCasino, 0);
+
+      console.log(bob);
+      console.log(ben);
+    </script>
+  </body>
+</html>
