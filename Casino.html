@@ -54,6 +54,7 @@
             if (amountMoney - gm.getMoney > 0) {
               amountMoney -= gm.getMoney;
               gm.takeMoney(gm.getMoney);
+              this.money += amountMoney;
             } else {
               gm.takeMoney(amountMoney);
               this.money += amountMoney;
@@ -84,7 +85,7 @@
 
           if (casino.gameMachines[numberGameMachine - 1] != null) {
             casino.gameMachines.splice(numberGameMachine - 1, 1);
-            casino.gameMachines.map((gm) =>
+            casino.gameMachines.forEach(gm) =>
               gm.putMoney(theRemainingMoney / casino.gameMachines.length)
             );
           } else {
